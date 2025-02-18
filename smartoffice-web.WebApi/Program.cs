@@ -38,6 +38,7 @@ app.Use(async (context, next) =>
     logger.LogInformation($"🌍 Incoming Request: {context.Request.Method} {context.Request.Path}");
     await next.Invoke();
 });
+app.MapGet("/", () => "Hello world, the API is up ");
 
 // ✅ Start API  
 if (app.Environment.IsDevelopment())
