@@ -5,12 +5,12 @@ using smartoffice_web.WebApi.Models;
 
 namespace smartoffice_web.WebApi.Repositories
 {
-    public interface IEnviroment2DRepository
+    public interface IEnvironment2DRepository
     {
-        Task<IEnumerable<Enviroment2D>> GetAllWorldsAsync();
-        Task<Enviroment2D?> GetWorldByIdAsync(Guid id);  // Changed int to Guid
-        Task AddWorldAsync(Enviroment2D enviroment2D);
-        Task UpdateWorldAsync(Enviroment2D enviroment2D);
+        Task<IEnumerable<Environment2D>> GetAllEnvironment2DsAsync();
+        Task<Environment2D?> GetWorldByIdAsync(Guid id);  // Changed int to Guid
+        Task AddWorldAsync(Environment2D environment2D);
+        Task UpdateWorldAsync(Environment2D environment2D);
         Task DeleteWorldAsync(Guid id);  // Changed int to Guid
     }
 }

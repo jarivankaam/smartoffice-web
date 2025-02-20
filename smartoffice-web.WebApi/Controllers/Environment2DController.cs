@@ -12,15 +12,15 @@ namespace smartoffice_web.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class Enviroment2DController : ControllerBase
+    public class Environment2DController : ControllerBase
     {
         private readonly IEnvironment2DRepository _environment2DRepository;
-        private readonly ILogger<Enviroment2DController> _logger;
+        private readonly ILogger<Environment2DController> _logger;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorProvider;
 
-        public Enviroment2DController(
+        public Environment2DController(
             IEnvironment2DRepository environment2DRepository, 
-            ILogger<Enviroment2DController> logger,
+            ILogger<Environment2DController> logger,
             IActionDescriptorCollectionProvider actionDescriptorProvider)
         {
             _environment2DRepository = environment2DRepository;
@@ -31,7 +31,7 @@ namespace smartoffice_web.WebApi.Controllers
         [HttpGet]
         public async Task<IEnumerable<Environment2D>> Get()
         {
-            return await _environment2DRepository.GetAllWorldsAsync();
+            return await _environment2DRepository.GetAllEnvironment2DsAsync();
         }
 
         [HttpGet("{id:guid}")]

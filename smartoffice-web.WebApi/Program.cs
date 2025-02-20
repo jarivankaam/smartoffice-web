@@ -19,7 +19,7 @@ var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 logger.LogInformation($"🔍 Loaded Connection String: {connectionString}");
 
-// ✅ Register Services
+// ✅ Register Servicesuunity
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -27,10 +27,14 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     new SqlConnection(connectionString));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IWorldRepository, WorldRepository>();
-builder.Services.AddScoped<IGameObjectRepository, GameObjectRepository>();
+builder.Services.AddScoped<IEnvironment2DRepository, Environment2DRepository>();
+builder.Services.AddScoped<IObject2DRepository, Object2DRepository>();
 
 var app = builder.Build();
+var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString"); 
+var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString); 
+app.MapGet("/", () => $"The API is up . Connection string found: {(sqlConnectionStringFound ? "" : "")}");
+
 
 // ✅ Middleware for Logging API Calls
 app.Use(async (context, next) =>
@@ -38,7 +42,6 @@ app.Use(async (context, next) =>
     logger.LogInformation($"🌍 Incoming Request: {context.Request.Method} {context.Request.Path}");
     await next.Invoke();
 });
-app.MapGet("/", () => "Hello world, the API is up ");
 
 // ✅ Start API  
 if (app.Environment.IsDevelopment())
