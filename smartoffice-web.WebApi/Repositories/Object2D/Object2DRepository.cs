@@ -21,20 +21,20 @@ namespace smartoffice_web.WebApi.Repositories
 
         public async Task<IEnumerable<Object2D>> GetAllObject2DsAsync()
         {
-            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM objects";
+            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM Object2D";
             return await _dbConnection.QueryAsync<Object2D>(sql);
         }
 
         public async Task<Object2D?> GetObject2DByIdAsync(Guid id)
         {
-            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM objects WHERE id = @Id";
+            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM Object2D WHERE id = @Id";
             return await _dbConnection.QueryFirstOrDefaultAsync<Object2D>(sql, new { Id = id });
         }
 
         public async Task AddObject2DAsync(Object2D Object2D)
         {
             string sql = @"
-                INSERT INTO objects (id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId) 
+                INSERT INTO Object2D (id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId) 
                 VALUES (@Id, @PrefabId, @PositionX, @PositionY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @WorldId)";
 
             Object2D.Id = Object2D.Id == Guid.Empty ? Guid.NewGuid() : Object2D.Id; // Ensure a GUID is assigned
@@ -44,7 +44,7 @@ namespace smartoffice_web.WebApi.Repositories
         public async Task UpdateObject2DAsync(Object2D Object2D)
         {
             string sql = @"
-                UPDATE objects 
+                UPDATE Object2D 
                 SET prefabId = @PrefabId, positionX = @PositionX, positionY = @PositionY, 
                     scaleX = @ScaleX, scaleY = @ScaleY, RotationZ = @RotationZ, SortingLayer = @SortingLayer, 
                     worldId = @WorldId 
@@ -55,7 +55,7 @@ namespace smartoffice_web.WebApi.Repositories
 
         public async Task DeleteObject2DAsync(Guid id)
         {
-            string sql = "DELETE FROM objects WHERE id = @Id";
+            string sql = "DELETE FROM Object2D WHERE id = @Id";
             await _dbConnection.ExecuteAsync(sql, new { Id = id });
         }
     }
