@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Dapper;
+using smartoffice_web.WebApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper;
-using smartoffice_web.WebApi.Models;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 
 namespace smartoffice_web.WebApi.Repositories
 {
@@ -13,49 +11,38 @@ namespace smartoffice_web.WebApi.Repositories
     {
         private readonly IDbConnection _dbConnection;
 
-        public Object2DRepository(IConfiguration configuration)
+        public Object2DRepository(IDbConnection dbConnection)
         {
-            string? connectionString = configuration.GetConnectionString("DefaultConnection");
-            _dbConnection = new SqlConnection(connectionString);
+            _dbConnection = dbConnection;
         }
 
         public async Task<IEnumerable<Object2D>> GetAllObject2DsAsync()
         {
-            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM Object2D";
+            var sql = "SELECT * FROM Object2D";
             return await _dbConnection.QueryAsync<Object2D>(sql);
         }
 
-        public async Task<Object2D?> GetObject2DByIdAsync(Guid id)
+        public async Task<Object2D> GetObject2DByIdAsync(Guid id)
         {
-            string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM Object2D WHERE id = @Id";
+            var sql = "SELECT * FROM Object2D WHERE Id = @Id";
             return await _dbConnection.QueryFirstOrDefaultAsync<Object2D>(sql, new { Id = id });
         }
 
-        public async Task AddObject2DAsync(Object2D Object2D)
+        public async Task AddObject2DAsync(Object2D object2D)
         {
-            string sql = @"
-                INSERT INTO Object2D (id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId) 
-                VALUES (@Id, @PrefabId, @PositionX, @PositionY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @WorldId)";
-
-            Object2D.Id = Object2D.Id == Guid.Empty ? Guid.NewGuid() : Object2D.Id; // Ensure a GUID is assigned
-            await _dbConnection.ExecuteAsync(sql, Object2D);
+            var sql = "INSERT INTO Object2D (Id, Name, PositionX, PositionY) VALUES (@Id, @Name, @PositionX, @PositionY)";
+            await _dbConnection.ExecuteAsync(sql, object2D);
         }
 
-        public async Task UpdateObject2DAsync(Object2D Object2D)
+        public async Task UpdateObject2DAsync(Object2D object2D)
         {
-            string sql = @"
-                UPDATE Object2D 
-                SET prefabId = @PrefabId, positionX = @PositionX, positionY = @PositionY, 
-                    scaleX = @ScaleX, scaleY = @ScaleY, RotationZ = @RotationZ, SortingLayer = @SortingLayer, 
-                    worldId = @WorldId 
-                WHERE id = @Id";
-
-            await _dbConnection.ExecuteAsync(sql, Object2D);
+            var sql = "UPDATE Object2D SET Name = @Name, PositionX = @PositionX, PositionY = @PositionY WHERE Id = @Id";
+            await _dbConnection.ExecuteAsync(sql, object2D);
         }
 
         public async Task DeleteObject2DAsync(Guid id)
         {
-            string sql = "DELETE FROM Object2D WHERE id = @Id";
+            var sql = "DELETE FROM Object2D WHERE Id = @Id";
             await _dbConnection.ExecuteAsync(sql, new { Id = id });
         }
     }

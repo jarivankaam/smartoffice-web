@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Dapper;
+using smartoffice_web.WebApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using Dapper;
-using smartoffice_web.WebApi.Models;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 
 namespace smartoffice_web.WebApi.Repositories
 {
@@ -13,40 +11,38 @@ namespace smartoffice_web.WebApi.Repositories
     {
         private readonly IDbConnection _dbConnection;
 
-        public UserRepository(IConfiguration configuration)
+        public UserRepository(IDbConnection dbConnection)
         {
-            string? connectionString = configuration.GetConnectionString("DefaultConnection");
-            _dbConnection = new SqlConnection(connectionString);
+            _dbConnection = dbConnection;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            string sql = "SELECT * FROM Users";
+            var sql = "SELECT * FROM Users";
             return await _dbConnection.QueryAsync<User>(sql);
         }
 
-        public async Task<User?> GetUserByIdAsync(Guid id) // Changed int to Guid
+        public async Task<User> GetUserByIdAsync(Guid id)
         {
-            string sql = "SELECT * FROM Users WHERE Id = @Id";
+            var sql = "SELECT * FROM Users WHERE Id = @Id";
             return await _dbConnection.QueryFirstOrDefaultAsync<User>(sql, new { Id = id });
         }
 
         public async Task AddUserAsync(User user)
         {
-            string sql = "INSERT INTO Users (Id, UserName, Password) VALUES (@Id, @UserName, @Password)";
-            user.Id = user.Id == Guid.Empty ? Guid.NewGuid() : user.Id; // Ensure a GUID is assigned
+            var sql = "INSERT INTO Users (Id, Name, Email) VALUES (@Id, @Name, @Email)";
             await _dbConnection.ExecuteAsync(sql, user);
         }
 
         public async Task UpdateUserAsync(User user)
         {
-            string sql = "UPDATE Users SET UserName = @UserName, Password = @Password WHERE Id = @Id";
+            var sql = "UPDATE Users SET Name = @Name, Email = @Email WHERE Id = @Id";
             await _dbConnection.ExecuteAsync(sql, user);
         }
 
-        public async Task DeleteUserAsync(Guid id) // Changed int to Guid
+        public async Task DeleteUserAsync(Guid id)
         {
-            string sql = "DELETE FROM Users WHERE Id = @Id";
+            var sql = "DELETE FROM Users WHERE Id = @Id";
             await _dbConnection.ExecuteAsync(sql, new { Id = id });
         }
     }
