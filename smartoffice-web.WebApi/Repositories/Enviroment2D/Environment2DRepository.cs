@@ -25,7 +25,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation("🔍 Executing query: SELECT * FROM Environment2D");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D";
+                string sql = "SELECT id, name, maxHeight, maxWidth,UserId FROM Environment2D";
                 var result = await _dbConnection.QueryAsync<Environment2D>(sql);
 
                 _logger.LogInformation($"✅ Query executed successfully. Retrieved {result.AsList().Count} Environment2D.");

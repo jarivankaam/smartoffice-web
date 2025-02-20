@@ -67,7 +67,7 @@ async Task TestDatabaseConnection()
 // ✅ Run database test before the API starts
 await TestDatabaseConnection();
 
-app.MapGet("/", () => $"The API is up. Connection string found: {(sqlConnectionStringFound ? sqlConnectionString : "No")}");
+app.MapGet("/", () => $"The API is up. Connection string found: {(sqlConnectionStringFound ? "Yes" : "No")}");
 
 // ✅ Middleware for Logging API Calls
 app.Use(async (context, next) =>
