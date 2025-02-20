@@ -12,32 +12,32 @@ namespace smartoffice_web.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WorldController : ControllerBase
+    public class Enviroment2DController : ControllerBase
     {
-        private readonly IWorldRepository _worldRepository;
-        private readonly ILogger<WorldController> _logger;
+        private readonly IEnvironment2DRepository _environment2DRepository;
+        private readonly ILogger<Enviroment2DController> _logger;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorProvider;
 
-        public WorldController(
-            IWorldRepository worldRepository, 
-            ILogger<WorldController> logger,
+        public Enviroment2DController(
+            IEnvironment2DRepository environment2DRepository, 
+            ILogger<Enviroment2DController> logger,
             IActionDescriptorCollectionProvider actionDescriptorProvider)
         {
-            _worldRepository = worldRepository;
+            _environment2DRepository = environment2DRepository;
             _logger = logger;
             _actionDescriptorProvider = actionDescriptorProvider;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<World>> Get()
+        public async Task<IEnumerable<Environment2D>> Get()
         {
-            return await _worldRepository.GetAllWorldsAsync();
+            return await _environment2DRepository.GetAllWorldsAsync();
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<World>> GetById(Guid id)
+        public async Task<ActionResult<Environment2D>> GetById(Guid id)
         {
-            var world = await _worldRepository.GetWorldByIdAsync(id);
+            var world = await _environment2DRepository.GetWorldByIdAsync(id);
             if (world == null)
             {
                 return NotFound();
@@ -46,35 +46,35 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] World world)
+        public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
-            if (world == null)
+            if (environment2D == null)
             {
                 return BadRequest("Invalid world data.");
             }
 
-            world.Id = world.Id == Guid.Empty ? Guid.NewGuid() : world.Id; // Ensure an ID is assigned
-            await _worldRepository.AddWorldAsync(world);
+            environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id; // Ensure an ID is assigned
+            await _environment2DRepository.AddWorldAsync(environment2D);
             
-            return CreatedAtAction(nameof(GetById), new { id = world.Id }, world);
+            return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] World world)
+        public async Task<IActionResult> Update(Guid id, [FromBody] Environment2D environment2D)
         {
-            if (world == null || id != world.Id)
+            if (environment2D == null || id != environment2D.Id)
             {
                 return BadRequest("Invalid world data.");
             }
 
-            await _worldRepository.UpdateWorldAsync(world);
+            await _environment2DRepository.UpdateWorldAsync(environment2D);
             return NoContent();
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _worldRepository.DeleteWorldAsync(id);
+            await _environment2DRepository.DeleteWorldAsync(id);
             return NoContent();
         }
 
@@ -90,7 +90,6 @@ namespace smartoffice_web.WebApi.Controllers
                     Route = a.AttributeRouteInfo?.Template ?? $"{a.RouteValues["controller"]}/{a.RouteValues["action"]}"
                 })
                 .ToList();
-
             return Ok(routes);
         }
     }

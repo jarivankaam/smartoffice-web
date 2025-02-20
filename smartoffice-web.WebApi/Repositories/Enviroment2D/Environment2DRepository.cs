@@ -10,12 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace smartoffice_web.WebApi.Repositories
 {
-    public class WorldRepository : IWorldRepository
+    public class Environment2DRepository : IEnvironment2DRepository
     {
         private readonly string _connectionString;
-        private readonly ILogger<WorldRepository> _logger;
+        private readonly ILogger<Environment2DRepository> _logger;
 
-        public WorldRepository(IConfiguration configuration, ILogger<WorldRepository> logger)
+        public Environment2DRepository(IConfiguration configuration, ILogger<Environment2DRepository> logger)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection");
             _logger = logger;
@@ -40,7 +40,7 @@ namespace smartoffice_web.WebApi.Repositories
             }
         }
 
-        public async Task<IEnumerable<World>> GetAllWorldsAsync()
+        public async Task<IEnumerable<Enviroment2D>> GetAllWorldsAsync()
         {
             try
             {
@@ -48,7 +48,7 @@ namespace smartoffice_web.WebApi.Repositories
                 _logger.LogInformation("🔍 Executing query: SELECT * FROM worlds");
 
                 string sql = "SELECT id, name, maxHeight, maxWidth FROM worlds";
-                var result = await connection.QueryAsync<World>(sql);
+                var result = await connection.QueryAsync<Enviroment2D>(sql);
 
                 _logger.LogInformation($"✅ Query executed successfully. Retrieved {result.AsList().Count} worlds.");
                 return result;
@@ -60,7 +60,7 @@ namespace smartoffice_web.WebApi.Repositories
             }
         }
 
-        public async Task<World?> GetWorldByIdAsync(Guid id)
+        public async Task<Enviroment2D?> GetWorldByIdAsync(Guid id)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace smartoffice_web.WebApi.Repositories
                 _logger.LogInformation($"🔍 Fetching world with ID: {id}");
 
                 string sql = "SELECT id, name, maxHeight, maxWidth FROM worlds WHERE id = @Id";
-                var world = await connection.QueryFirstOrDefaultAsync<World>(sql, new { Id = id });
+                var world = await connection.QueryFirstOrDefaultAsync<Enviroment2D>(sql, new { Id = id });
 
                 if (world != null)
                     _logger.LogInformation("✅ World retrieved successfully.");
@@ -84,17 +84,17 @@ namespace smartoffice_web.WebApi.Repositories
             }
         }
 
-        public async Task AddWorldAsync(World world)
+        public async Task AddWorldAsync(Enviroment2D enviroment2D)
         {
             try
             {
                 using var connection = CreateConnection();
-                world.Id = world.Id == Guid.Empty ? Guid.NewGuid() : world.Id;
+                enviroment2D.Id = enviroment2D.Id == Guid.Empty ? Guid.NewGuid() : enviroment2D.Id;
 
-                _logger.LogInformation($"📝 Inserting new world with ID: {world.Id}");
+                _logger.LogInformation($"📝 Inserting new world with ID: {enviroment2D.Id}");
 
                 string sql = "INSERT INTO worlds (id, name, maxHeight, maxWidth) VALUES (@Id, @Name, @MaxHeight, @MaxWidth)";
-                await connection.ExecuteAsync(sql, world);
+                await connection.ExecuteAsync(sql, enviroment2D);
 
                 _logger.LogInformation("✅ World inserted successfully.");
             }
@@ -105,15 +105,15 @@ namespace smartoffice_web.WebApi.Repositories
             }
         }
 
-        public async Task UpdateWorldAsync(World world)
+        public async Task UpdateWorldAsync(Enviroment2D enviroment2D)
         {
             try
             {
                 using var connection = CreateConnection();
-                _logger.LogInformation($"🔄 Updating world with ID: {world.Id}");
+                _logger.LogInformation($"🔄 Updating world with ID: {enviroment2D.Id}");
 
                 string sql = "UPDATE worlds SET name = @Name, maxHeight = @MaxHeight, maxWidth = @MaxWidth WHERE id = @Id";
-                await connection.ExecuteAsync(sql, world);
+                await connection.ExecuteAsync(sql, enviroment2D);
 
                 _logger.LogInformation("✅ World updated successfully.");
             }

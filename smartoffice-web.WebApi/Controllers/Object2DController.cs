@@ -10,64 +10,64 @@ namespace smartoffice_web.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GameObjectController : ControllerBase
+    public class Object2DController : ControllerBase
     {
-        private readonly IGameObjectRepository _gameObjectRepository;
-        private readonly ILogger<GameObjectController> _logger;
+        private readonly IObject2DRepository _Object2DRepository;
+        private readonly ILogger<Object2DController> _logger;
 
-        public GameObjectController(IGameObjectRepository gameObjectRepository, ILogger<GameObjectController> logger)
+        public Object2DController(IObject2DRepository Object2DRepository, ILogger<Object2DController> logger)
         {
-            _gameObjectRepository = gameObjectRepository;
+            _Object2DRepository = Object2DRepository;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<GameObject>> Get()
+        public async Task<IEnumerable<Object2D>> Get()
         {
             _logger.LogInformation("Fetching all game objects.");
-            return await _gameObjectRepository.GetAllGameObjectsAsync();
+            return await _Object2DRepository.GetAllObject2DsAsync();
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<GameObject>> GetById(Guid id)
+        public async Task<ActionResult<Object2D>> GetById(Guid id)
         {
             _logger.LogInformation($"Fetching game object with ID: {id}");
-            var gameObject = await _gameObjectRepository.GetGameObjectByIdAsync(id);
-            if (gameObject == null)
+            var Object2D = await _Object2DRepository.GetObject2DByIdAsync(id);
+            if (Object2D == null)
             {
                 _logger.LogWarning($"Game object with ID {id} not found.");
                 return NotFound();
             }
-            return Ok(gameObject);
+            return Ok(Object2D);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] GameObject gameObject)
+        public async Task<IActionResult> Create([FromBody] Object2D Object2D)
         {
-            if (gameObject == null)
+            if (Object2D == null)
             {
                 _logger.LogWarning("Attempted to create a null game object.");
                 return BadRequest("Invalid game object data.");
             }
 
-            gameObject.Id = gameObject.Id == Guid.Empty ? Guid.NewGuid() : gameObject.Id;
-            _logger.LogInformation($"Creating game object with ID: {gameObject.Id}");
+            Object2D.Id = Object2D.Id == Guid.Empty ? Guid.NewGuid() : Object2D.Id;
+            _logger.LogInformation($"Creating game object with ID: {Object2D.Id}");
 
-            await _gameObjectRepository.AddGameObjectAsync(gameObject);
-            return CreatedAtAction(nameof(GetById), new { id = gameObject.Id }, gameObject);
+            await _Object2DRepository.AddObject2DAsync(Object2D);
+            return CreatedAtAction(nameof(GetById), new { id = Object2D.Id }, Object2D);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] GameObject gameObject)
+        public async Task<IActionResult> Update(Guid id, [FromBody] Object2D Object2D)
         {
-            if (gameObject == null || id != gameObject.Id)
+            if (Object2D == null || id != Object2D.Id)
             {
                 _logger.LogWarning("Game object ID mismatch or invalid data provided.");
                 return BadRequest("Invalid game object data.");
             }
 
             _logger.LogInformation($"Updating game object with ID: {id}");
-            await _gameObjectRepository.UpdateGameObjectAsync(gameObject);
+            await _Object2DRepository.UpdateObject2DAsync(Object2D);
             return NoContent();
         }
 
@@ -75,7 +75,7 @@ namespace smartoffice_web.WebApi.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             _logger.LogInformation($"Deleting game object with ID: {id}");
-            await _gameObjectRepository.DeleteGameObjectAsync(id);
+            await _Object2DRepository.DeleteObject2DAsync(id);
             return NoContent();
         }
     }

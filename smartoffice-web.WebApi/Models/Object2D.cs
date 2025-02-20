@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace smartoffice_web.WebApi.Models
 {
-    public class GameObject
+    public class Object2D
     {
         public Guid Id { get; set; }
 
         [Required]
         public Guid PrefabId { get; set; }
 
-        [Required]
+        [Required]  
         public int PositionX { get; set; }
 
         [Required]
@@ -28,6 +28,6 @@ namespace smartoffice_web.WebApi.Models
         [Required]
         public int SortingLayer { get; set; }
 
-        public Guid? WorldId { get; set; } // Nullable because `worldId` allows NULL in your schema
+        public Guid? Environment2DID { get; set; } // Nullable because `worldId` allows NULL in your schema
     }
 }

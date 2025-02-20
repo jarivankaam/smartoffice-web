@@ -9,39 +9,39 @@ using Microsoft.Extensions.Configuration;
 
 namespace smartoffice_web.WebApi.Repositories
 {
-    public class GameObjectRepository : IGameObjectRepository
+    public class Object2DRepository : IObject2DRepository
     {
         private readonly IDbConnection _dbConnection;
 
-        public GameObjectRepository(IConfiguration configuration)
+        public Object2DRepository(IConfiguration configuration)
         {
             string? connectionString = configuration.GetConnectionString("DefaultConnection");
             _dbConnection = new SqlConnection(connectionString);
         }
 
-        public async Task<IEnumerable<GameObject>> GetAllGameObjectsAsync()
+        public async Task<IEnumerable<Object2D>> GetAllObject2DsAsync()
         {
             string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM objects";
-            return await _dbConnection.QueryAsync<GameObject>(sql);
+            return await _dbConnection.QueryAsync<Object2D>(sql);
         }
 
-        public async Task<GameObject?> GetGameObjectByIdAsync(Guid id)
+        public async Task<Object2D?> GetObject2DByIdAsync(Guid id)
         {
             string sql = "SELECT id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId FROM objects WHERE id = @Id";
-            return await _dbConnection.QueryFirstOrDefaultAsync<GameObject>(sql, new { Id = id });
+            return await _dbConnection.QueryFirstOrDefaultAsync<Object2D>(sql, new { Id = id });
         }
 
-        public async Task AddGameObjectAsync(GameObject gameObject)
+        public async Task AddObject2DAsync(Object2D Object2D)
         {
             string sql = @"
                 INSERT INTO objects (id, prefabId, positionX, positionY, scaleX, scaleY, RotationZ, SortingLayer, worldId) 
                 VALUES (@Id, @PrefabId, @PositionX, @PositionY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @WorldId)";
 
-            gameObject.Id = gameObject.Id == Guid.Empty ? Guid.NewGuid() : gameObject.Id; // Ensure a GUID is assigned
-            await _dbConnection.ExecuteAsync(sql, gameObject);
+            Object2D.Id = Object2D.Id == Guid.Empty ? Guid.NewGuid() : Object2D.Id; // Ensure a GUID is assigned
+            await _dbConnection.ExecuteAsync(sql, Object2D);
         }
 
-        public async Task UpdateGameObjectAsync(GameObject gameObject)
+        public async Task UpdateObject2DAsync(Object2D Object2D)
         {
             string sql = @"
                 UPDATE objects 
@@ -50,10 +50,10 @@ namespace smartoffice_web.WebApi.Repositories
                     worldId = @WorldId 
                 WHERE id = @Id";
 
-            await _dbConnection.ExecuteAsync(sql, gameObject);
+            await _dbConnection.ExecuteAsync(sql, Object2D);
         }
 
-        public async Task DeleteGameObjectAsync(Guid id)
+        public async Task DeleteObject2DAsync(Guid id)
         {
             string sql = "DELETE FROM objects WHERE id = @Id";
             await _dbConnection.ExecuteAsync(sql, new { Id = id });

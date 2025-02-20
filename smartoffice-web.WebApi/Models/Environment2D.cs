@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace smartoffice_web.WebApi.Models
 {
-    public class World
+    public class Environment2D
     {
         public Guid Id { get; set; }
 
