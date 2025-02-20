@@ -16,23 +16,22 @@ if (builder.Environment.IsDevelopment())
 var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<Program>();
 
 // ✅ Fetch Connection String and Log It
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-logger.LogInformation($"🔍 Loaded Connection String: {connectionString}");
+var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString");
+var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
 
 // ✅ Register Servicesuunity
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+
 builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqlConnection(connectionString));
+    new SqlConnection(sqlConnectionString));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEnvironment2DRepository, Environment2DRepository>();
 builder.Services.AddScoped<IObject2DRepository, Object2DRepository>();
 
 var app = builder.Build();
-var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString"); 
-var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString); 
 app.MapGet("/", () => $"The API is up . Connection string found: {(sqlConnectionStringFound ? "" : "")}");
 
 
