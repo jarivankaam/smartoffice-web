@@ -33,7 +33,7 @@ builder.Services.AddScoped<IEnvironment2DRepository, Environment2DRepository>();
 builder.Services.AddScoped<IObject2DRepository, Object2DRepository>();
 
 var app = builder.Build();
-app.MapGet("/", () => $"The API is up . Connection string found: {(sqlConnectionStringFound ? "" : "")}");
+app.MapGet("/", () => $"The API is up . Connection string found: {(sqlConnectionStringFound ? "Yes" : "No")}");
 
 
 // ✅ Middleware for Logging API Calls
