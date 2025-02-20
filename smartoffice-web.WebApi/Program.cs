@@ -16,7 +16,8 @@ if (builder.Environment.IsDevelopment())
 var logger = LoggerFactory.Create(logging => logging.AddConsole()).CreateLogger<Program>();
 
 // ✅ Fetch Connection String and Log It
-var sqlConnectionString = builder.Configuration.GetValue<string>("SqlConnectionString");
+var sqlConnectionString = builder.Configuration.GetConnectionString("sqlConnectionString");
+
 var sqlConnectionStringFound = !string.IsNullOrWhiteSpace(sqlConnectionString);
 
 // ✅ Register Servicesuunity
