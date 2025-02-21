@@ -7,10 +7,34 @@ namespace smartoffice_web.WebApi.Repositories
 {
     public interface IEnvironment2DRepository
     {
+        /// <summary>
+        /// Retrieve all Environment2D objects.
+        /// </summary>
         Task<IEnumerable<Environment2D>> GetAllEnvironment2DsAsync();
-        Task<Environment2D?> GetWorldByIdAsync(Guid id);  // Changed int to Guid
+
+        /// <summary>
+        /// Retrieve a specific Environment2D by ID.
+        /// </summary>
+        Task<Environment2D?> GetWorldByIdAsync(Guid id);
+
+        /// <summary>
+        /// Retrieve all Environment2D objects belonging to a specific user.
+        /// </summary>
+        Task<IEnumerable<Environment2D>> GetWorldsByUserIdAsync(Guid appUserId); // ✅ Added method for filtering by user
+
+        /// <summary>
+        /// Add a new Environment2D.
+        /// </summary>
         Task AddWorldAsync(Environment2D environment2D);
+
+        /// <summary>
+        /// Update an existing Environment2D.
+        /// </summary>
         Task UpdateWorldAsync(Environment2D environment2D);
-        Task DeleteWorldAsync(Guid id);  // Changed int to Guid
+
+        /// <summary>
+        /// Delete an Environment2D by ID.
+        /// </summary>
+        Task DeleteWorldAsync(Guid id);
     }
 }
