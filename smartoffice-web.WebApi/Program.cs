@@ -61,8 +61,8 @@ app.MapPost("/auth/logout",
  })
 .RequireAuthorization();
 
-app.MapControllers()
-    .RequireAuthorization();
+//app.MapControllers()
+//    .RequireAuthorization();
 
 
 
