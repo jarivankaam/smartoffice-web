@@ -40,7 +40,6 @@ builder.Services.AddScoped<IDbConnection>(sp =>
     return new SqlConnection(sqlConnectionString);
 });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEnvironment2DRepository, Environment2DRepository>();
 builder.Services.AddScoped<IObject2DRepository, Object2DRepository>();
 
@@ -60,12 +59,6 @@ app.MapPost("/auth/logout",
      return Results.Unauthorized();
  })
 .RequireAuthorization();
-
-app.MapControllers()
-    .RequireAuthorization();
-
-
-
 
 app.MapGet("/", () => $"The API is up. Connection string found: {(sqlConnectionStringFound ? "Yes" : "No")}");
 

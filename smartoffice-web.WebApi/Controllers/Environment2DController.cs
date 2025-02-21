@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace smartoffice_web.WebApi.Controllers
 {
@@ -35,6 +36,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<ActionResult<Environment2D>> GetById(Guid id)
         {
             var world = await _environment2DRepository.GetWorldByIdAsync(id);
@@ -46,6 +48,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
             if (environment2D == null)
@@ -60,6 +63,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Update(Guid id, [FromBody] Environment2D environment2D)
         {
             if (environment2D == null || id != environment2D.Id)
@@ -72,25 +76,11 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _environment2DRepository.DeleteWorldAsync(id);
             return NoContent();
-        }
-
-        // ✅ Route to Get All Available API Endpoints for Debugging
-        [HttpGet("routes")]
-        public IActionResult GetAllRoutes()
-        {
-            var routes = _actionDescriptorProvider.ActionDescriptors.Items
-                .Where(a => a.AttributeRouteInfo != null)
-                .Select(a => new
-                {
-                    Method = string.Join(", ", a.ActionConstraints?.SelectMany(ac => ac.ToString().Split(' ')) ?? new[] { "ANY" }),
-                    Route = a.AttributeRouteInfo?.Template ?? $"{a.RouteValues["controller"]}/{a.RouteValues["action"]}"
-                })
-                .ToList();
-            return Ok(routes);
         }
     }
 }

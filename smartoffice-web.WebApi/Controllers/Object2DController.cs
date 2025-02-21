@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace smartoffice_web.WebApi.Controllers
 {
@@ -29,6 +30,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<ActionResult<Object2D>> GetById(Guid id)
         {
             _logger.LogInformation($"Fetching game object with ID: {id}");
@@ -42,6 +44,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] Object2D Object2D)
         {
             if (Object2D == null)
@@ -58,6 +61,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Update(Guid id, [FromBody] Object2D Object2D)
         {
             if (Object2D == null || id != Object2D.Id)
@@ -72,6 +76,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid id)
         {
             _logger.LogInformation($"Deleting game object with ID: {id}");
