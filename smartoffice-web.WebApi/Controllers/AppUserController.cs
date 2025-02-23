@@ -99,6 +99,8 @@ namespace smartoffice_web.WebApi.Controllers
                 _logger.LogWarning("Worlds for user with Id {UserId} not found.", userId);
                 return NotFound();
             }
+            _logger.LogInformation("Worlds for user with Id {UserId} found.", userId);
+            _logger.LogInformation("Worlds found: {userWorlds}", userWorlds);
             return Ok(userWorlds);
         }
     }
