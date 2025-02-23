@@ -44,7 +44,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🔍 Fetching world with ID: {id}");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, AppUserId FROM Environment2D WHERE id = @Id"; // ✅ AppUserId toegevoegd
+                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D WHERE id = @Id"; // ✅ AppUserId toegevoegd
                 var world = await _dbConnection.QueryFirstOrDefaultAsync<Environment2D>(sql, new { Id = id });
 
                 if (world != null)

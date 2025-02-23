@@ -23,6 +23,12 @@ public class AppUserRepository : IAppUserRepository
         var query = "SELECT * FROM AppUsers WHERE IdentityUserId = @IdentityUserId";
         return await _dbConnection.QuerySingleOrDefaultAsync<AppUser>(query, new { IdentityUserId = identityUserId });
     }
+    
+    public async Task<AppUser> GetUserIdAsync(string userID)
+    {
+        var query = "SELECT * FROM AppUsers WHERE IdentityUserId = @Id";
+        return await _dbConnection.QuerySingleOrDefaultAsync<AppUser>(query, new { Id = userID });
+    }
 
     public async Task<Guid> CreateAppUserAsync(AppUser user)
     {

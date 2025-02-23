@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 public interface IAppUserRepository
 {
     Task<AppUser> GetByIdentityUserIdAsync(string identityUserId);
+    Task<AppUser> GetUserIdAsync(string userID);
     Task<Guid> CreateAppUserAsync(AppUser user);
 }
