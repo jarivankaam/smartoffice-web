@@ -50,7 +50,6 @@ namespace smartoffice_web.WebApi.Controllers
 
         [HttpPost]
         // [Authorize]
-        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
             _logger.LogInformation($"🚀 Create() called with: {Newtonsoft.Json.JsonConvert.SerializeObject(environment2D)}");
