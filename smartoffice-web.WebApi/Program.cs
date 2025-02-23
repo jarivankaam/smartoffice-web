@@ -62,6 +62,11 @@ app.MapPost("/auth/logout",
     .RequireAuthorization();
 
 app.MapGet("/", () => $"The API is up. Connection string found: {(sqlConnectionStringFound ? "Yes" : "No")}");
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"📌 Incoming request: {context.Request.Method} {context.Request.Path}");
+    await next();
+});
 
 if (app.Environment.IsDevelopment())
 {
