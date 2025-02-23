@@ -72,7 +72,7 @@ namespace smartoffice_web.WebApi.Repositories
 
                 _logger.LogInformation($"📝 Inserting new world with ID: {environment2D.Id}");
 
-                string sql = "INSERT INTO Environment2D (Id, Name, MaxHeight, MaxWidth, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxWidth, @UserId)";
+                string sql = "INSERT INTO Environment2D (id, Name, MaxHeight, MaxWidth, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxWidth, @UserId)";
                 
                 if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 
