@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace smartoffice_web.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AppUserController : ControllerBase
     {
