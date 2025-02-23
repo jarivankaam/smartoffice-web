@@ -49,29 +49,20 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] dynamic request)
+        public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
             try
             {
-                _logger.LogInformation($"🚀 Create() called with: {JsonConvert.SerializeObject(request)}");
+                _logger.LogInformation($"🚀 Create() called with: {JsonConvert.SerializeObject(environment2D)}");
 
-                // Validate JSON properties
-                if (!Guid.TryParse((string)request.appUserId, out Guid parsedGuid))
+                // Ensure the GUID is valid
+                if (environment2D.AppUserId == Guid.Empty)
                 {
                     _logger.LogError("❌ ERROR: Invalid or missing AppUserId.");
                     return BadRequest("Invalid or missing AppUserId.");
                 }
 
-                // Convert JSON to model
-                var environment2D = new Environment2D
-                {
-                    Id = Guid.NewGuid(),
-                    Name = request.name,
-                    MaxHeight = request.maxHeight,
-                    MaxWidth = request.maxWidth,
-                    AppUserId = parsedGuid  // ✅ Convert string to Guid before saving
-                };
-
+                environment2D.Id = Guid.NewGuid(); // Assign a new unique ID
                 await _environment2DRepository.AddWorldAsync(environment2D);
 
                 _logger.LogInformation($"✅ Insert attempt completed for ID: {environment2D.Id}");
@@ -84,6 +75,7 @@ namespace smartoffice_web.WebApi.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
 
 
