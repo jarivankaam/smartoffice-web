@@ -120,24 +120,5 @@ namespace smartoffice_web.WebApi.Repositories
                 throw;
             }
         }
-        public async Task<IEnumerable<Environment2D>> GetWorldsByUserIdAsync(Guid appUserId)
-        {
-            try
-            {
-                _logger.LogInformation($"🔍 Fetching all worlds for User ID: {appUserId}");
-
-                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D WHERE AppUserId = @AppUserId";
-                var result = await _dbConnection.QueryAsync<Environment2D>(sql, new { AppUserId = appUserId });
-
-                _logger.LogInformation($"✅ Retrieved {result.AsList().Count} worlds for User ID: {appUserId}");
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"❌ ERROR in GetWorldsByUserIdAsync: {ex.Message}");
-                throw;
-            }
-        }
-
     }
 }

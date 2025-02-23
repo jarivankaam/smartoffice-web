@@ -6,6 +6,7 @@ using smartoffice_web.WebApi.Services;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace smartoffice_web.WebApi.Controllers
 {
@@ -73,6 +74,18 @@ namespace smartoffice_web.WebApi.Controllers
             user.Id = Guid.NewGuid();
             var createdUserId = await _appUserRepository.CreateAppUserAsync(user);
             return CreatedAtAction(nameof(GetUserId), new { userId = createdUserId }, createdUserId);
+        }
+        
+        [HttpGet("worlds/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<Guid>> GetUserWorlds(Guid userId)
+        {
+            var userWorlds = await _appUserRepository.GetUserWorlds(userId);
+            if (userWorlds == null)
+            {
+                return NotFound();
+            }
+            return Ok(userWorlds);
         }
     }
 }

@@ -36,5 +36,11 @@ public class AppUserRepository : IAppUserRepository
         await _dbConnection.ExecuteAsync(query, user);
         return user.Id;
     }
+    
+    public async Task<Guid> GetUserWorlds(Guid userId)
+    {
+        var query = "SELECT * FROM Environment2D WHERE UserId = @UserId";
+        return await _dbConnection.QuerySingleOrDefaultAsync<Guid>(query, new { UserId = userId });
+    }
 }
 

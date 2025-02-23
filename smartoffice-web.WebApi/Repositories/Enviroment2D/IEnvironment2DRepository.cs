@@ -20,7 +20,6 @@ namespace smartoffice_web.WebApi.Repositories
         /// <summary>
         /// Retrieve all Environment2D objects belonging to a specific user.
         /// </summary>
-        Task<IEnumerable<Environment2D>> GetWorldsByUserIdAsync(Guid appUserId); // ✅ Added method for filtering by user
 
         /// <summary>
         /// Add a new Environment2D.
@@ -36,5 +35,6 @@ namespace smartoffice_web.WebApi.Repositories
         /// Delete an Environment2D by ID.
         /// </summary>
         Task DeleteWorldAsync(Guid id);
+        
     }
 }
