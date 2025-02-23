@@ -68,7 +68,7 @@ namespace smartoffice_web.WebApi.Repositories
                 environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id;
                 _logger.LogInformation($"📝 Inserting new world with ID: {environment2D.Id}");
 
-                string sql = "INSERT INTO Environment2D (id, name, maxHeight, maxWidth, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxWidth, @AppUserId)"; // ✅ AppUserId toegevoegd
+                string sql = "INSERT INTO Environment2D (name, maxHeight, maxWidth, UserId) VALUES (@Name, @MaxHeight, @MaxWidth, @AppUserId)"; // ✅ AppUserId toegevoegd
 
                 await _dbConnection.ExecuteAsync(sql, environment2D);
 
