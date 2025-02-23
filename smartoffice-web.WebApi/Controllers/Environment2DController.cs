@@ -49,24 +49,42 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost("create")]
-        // [Authorize]
-        public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
+        public async Task<IActionResult> Create([FromBody] dynamic request)
         {
-            _logger.LogInformation($"🚀 Create() called with: {Newtonsoft.Json.JsonConvert.SerializeObject(environment2D)}");
-
-            if (environment2D == null)
+            try
             {
-                _logger.LogError("❌ ERROR: Received null environment2D");
-                return BadRequest("Invalid world data.");
+                _logger.LogInformation($"🚀 Create() called with: {JsonConvert.SerializeObject(request)}");
+
+                // Validate JSON properties
+                if (!Guid.TryParse((string)request.appUserId, out Guid parsedGuid))
+                {
+                    _logger.LogError("❌ ERROR: Invalid or missing AppUserId.");
+                    return BadRequest("Invalid or missing AppUserId.");
+                }
+
+                // Convert JSON to model
+                var environment2D = new Environment2D
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.name,
+                    MaxHeight = request.maxHeight,
+                    MaxWidth = request.maxWidth,
+                    AppUserId = parsedGuid  // ✅ Convert string to Guid before saving
+                };
+
+                await _environment2DRepository.AddWorldAsync(environment2D);
+
+                _logger.LogInformation($"✅ Insert attempt completed for ID: {environment2D.Id}");
+
+                return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
             }
-
-            environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id; 
-            await _environment2DRepository.AddWorldAsync(environment2D);
-    
-            _logger.LogInformation($"✅ Insert attempt completed for ID: {environment2D.Id}");
-
-            return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
+            catch (Exception ex)
+            {
+                _logger.LogError($"❌ ERROR in Create: {ex.Message}");
+                return StatusCode(500, "Internal server error");
+            }
         }
+
 
 
         [HttpPut("{id:guid}")]
