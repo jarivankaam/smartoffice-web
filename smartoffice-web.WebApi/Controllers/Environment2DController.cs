@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace smartoffice_web.WebApi.Controllers
 {
@@ -49,18 +50,25 @@ namespace smartoffice_web.WebApi.Controllers
 
         [HttpPost]
         // [Authorize]
+        [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
+            _logger.LogInformation($"🚀 Create() called with: {Newtonsoft.Json.JsonConvert.SerializeObject(environment2D)}");
+
             if (environment2D == null)
             {
+                _logger.LogError("❌ ERROR: Received null environment2D");
                 return BadRequest("Invalid world data.");
             }
 
-            // Ensure an ID is assigned
+            environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id; 
             await _environment2DRepository.AddWorldAsync(environment2D);
-            
+    
+            _logger.LogInformation($"✅ Insert attempt completed for ID: {environment2D.Id}");
+
             return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
         }
+
 
         [HttpPut("{id:guid}")]
         [Authorize]
