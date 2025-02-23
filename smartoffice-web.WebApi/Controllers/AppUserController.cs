@@ -43,7 +43,7 @@ namespace smartoffice_web.WebApi.Controllers
         public async Task<ActionResult<AppUser>> GetUserId(string userId)
         {
             _logger.LogInformation("Fetching user with UserId: {UserId}", userId);
-            var user = await _appUserRepository.GetUserIdAsync(userId);
+            
             if (user == null)
             {
                 _logger.LogWarning("User with UserId {UserId} not found.", userId);
@@ -65,7 +65,8 @@ namespace smartoffice_web.WebApi.Controllers
                     _logger.LogWarning("Current user with IdentityUserId {IdentityUserId} not found.", identityUserId);
                     return NotFound();
                 }
-                return Ok(user);
+                user = await _appUserRepository.GetUserIdAsync(user.IdentityUserId);
+                return Ok(user.Id);
             }
             catch (UnauthorizedAccessException ex)
             {
