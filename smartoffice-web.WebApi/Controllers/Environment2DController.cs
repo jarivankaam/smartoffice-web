@@ -56,7 +56,7 @@ namespace smartoffice_web.WebApi.Controllers
                 return BadRequest("Invalid world data.");
             }
 
-            environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id; // Ensure an ID is assigned
+            // Ensure an ID is assigned
             await _environment2DRepository.AddWorldAsync(environment2D);
             
             return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
