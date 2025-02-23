@@ -62,10 +62,15 @@ namespace smartoffice_web.WebApi.Controllers
                     return BadRequest("Invalid or missing AppUserId.");
                 }
 
-                environment2D.Id = Guid.NewGuid(); // Assign a new unique ID
+                // ✅ Assign a new GUID if the Id is missing
+                if (environment2D.Id == Guid.Empty)
+                {
+                    environment2D.Id = Guid.NewGuid();
+                }
+
                 await _environment2DRepository.AddWorldAsync(environment2D);
 
-                _logger.LogInformation($"✅ Insert attempt completed for ID: {environment2D.Id}");
+                _logger.LogInformation($"✅ Ins  ert attempt completed for ID: {environment2D.Id}");
 
                 return CreatedAtAction(nameof(GetById), new { id = environment2D.Id }, environment2D);
             }
@@ -75,6 +80,7 @@ namespace smartoffice_web.WebApi.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
 
 

@@ -1,8 +1,22 @@
-﻿public class Environment2D
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+public class Environment2D
 {
-    public Guid Id { get; set; }
+    [Key]
+    public Guid Id { get; set; } = Guid.NewGuid(); // ✅ Automatically generate a GUID
+
+    [Required]
     public string Name { get; set; }
+
+    [Required]
     public int MaxHeight { get; set; }
+
+    [Required]
     public int MaxWidth { get; set; }
-    public Guid AppUserId { get; set; } // ✅ Ensure this property exists
+
+    [Required]
+    [Column(TypeName = "uniqueidentifier")] // ✅ Ensures correct DB column type
+    public Guid AppUserId { get; set; }
 }
