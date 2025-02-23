@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
 using smartoffice_web.WebApi.Services;
@@ -16,19 +17,23 @@ namespace smartoffice_web.WebApi.Controllers
     {
         private readonly IAppUserRepository _appUserRepository;
         private readonly IIdentityService _identityService;
+        private readonly ILogger<AppUserController> _logger;
 
-        public AppUserController(IAppUserRepository appUserRepository, IIdentityService identityService)
+        public AppUserController(IAppUserRepository appUserRepository, IIdentityService identityService, ILogger<AppUserController> logger)
         {
             _appUserRepository = appUserRepository;
             _identityService = identityService;
+            _logger = logger;
         }
 
         [HttpGet("identity/{identityUserId}")]
         public async Task<ActionResult<AppUser>> GetByIdentityUserId(string identityUserId)
         {
+            _logger.LogInformation("Fetching user with IdentityUserId: {IdentityUserId}", identityUserId);
             var user = await _appUserRepository.GetByIdentityUserIdAsync(identityUserId);
             if (user == null)
             {
+                _logger.LogWarning("User with IdentityUserId {IdentityUserId} not found.", identityUserId);
                 return NotFound();
             }
             return Ok(user);
@@ -37,9 +42,11 @@ namespace smartoffice_web.WebApi.Controllers
         [HttpGet("{userId}")]
         public async Task<ActionResult<AppUser>> GetUserId(string userId)
         {
+            _logger.LogInformation("Fetching user with UserId: {UserId}", userId);
             var user = await _appUserRepository.GetUserIdAsync(userId);
             if (user == null)
             {
+                _logger.LogWarning("User with UserId {UserId} not found.", userId);
                 return NotFound();
             }
             return Ok(user);
@@ -51,15 +58,18 @@ namespace smartoffice_web.WebApi.Controllers
             try
             {
                 var identityUserId = await _identityService.GetCurrentUserIdAsync(User);
+                _logger.LogInformation("Fetching current user with IdentityUserId: {IdentityUserId}", identityUserId);
                 var user = await _appUserRepository.GetByIdentityUserIdAsync(identityUserId);
                 if (user == null)
                 {
+                    _logger.LogWarning("Current user with IdentityUserId {IdentityUserId} not found.", identityUserId);
                     return NotFound();
                 }
                 return Ok(user);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
+                _logger.LogError(ex, "Unauthorized access while fetching current user.");
                 return Unauthorized();
             }
         }
@@ -69,9 +79,11 @@ namespace smartoffice_web.WebApi.Controllers
         {
             if (user == null)
             {
+                _logger.LogWarning("Attempted to create a user with invalid data.");
                 return BadRequest("Invalid user data.");
             }
             user.Id = Guid.NewGuid();
+            _logger.LogInformation("Creating new user with Id: {UserId}", user.Id);
             var createdUserId = await _appUserRepository.CreateAppUserAsync(user);
             return CreatedAtAction(nameof(GetUserId), new { userId = createdUserId }, createdUserId);
         }
@@ -80,9 +92,11 @@ namespace smartoffice_web.WebApi.Controllers
         [Authorize]
         public async Task<ActionResult<Guid>> GetUserWorlds(Guid userId)
         {
+            _logger.LogInformation("Fetching worlds for user with Id: {UserId}", userId);
             var userWorlds = await _appUserRepository.GetUserWorlds(userId);
             if (userWorlds == null)
             {
+                _logger.LogWarning("Worlds for user with Id {UserId} not found.", userId);
                 return NotFound();
             }
             return Ok(userWorlds);
