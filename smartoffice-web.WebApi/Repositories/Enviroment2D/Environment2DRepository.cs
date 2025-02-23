@@ -23,12 +23,13 @@ namespace smartoffice_web.WebApi.Repositories
         {
             try
             {
-                _logger.LogInformation("🔍 Executing query: SELECT * FROM Environment2D");
+                _logger.LogInformation("🔍 Fetching all Environment2D records...");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D"; // ✅ AppUserId toegevoegd
+                string sql = "SELECT Id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D";
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 var result = await _dbConnection.QueryAsync<Environment2D>(sql);
 
-                _logger.LogInformation($"✅ Query executed successfully. Retrieved {result.AsList().Count} Environment2D.");
+                _logger.LogInformation($"✅ Retrieved {result.AsList().Count} Environment2D records.");
                 return result;
             }
             catch (Exception ex)
@@ -44,7 +45,8 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🔍 Fetching world with ID: {id}");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D WHERE id = @Id"; // ✅ AppUserId toegevoegd
+                string sql = "SELECT Id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D WHERE Id = @Id";
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 var world = await _dbConnection.QueryFirstOrDefaultAsync<Environment2D>(sql, new { Id = id });
 
                 if (world != null)
@@ -65,14 +67,37 @@ namespace smartoffice_web.WebApi.Repositories
         {
             try
             {
-                environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id;
+                if (environment2D.Id == Guid.Empty)
+                    environment2D.Id = Guid.NewGuid();
+
                 _logger.LogInformation($"📝 Inserting new world with ID: {environment2D.Id}");
 
-                string sql = "INSERT INTO Environment2D (name, maxHeight, maxWidth, UserId) VALUES (@Name, @MaxHeight, @MaxWidth, @AppUserId)"; // ✅ AppUserId toegevoegd
+                string sql = "INSERT INTO Environment2D (Id, Name, MaxHeight, MaxWidth, UserId) VALUES (@Id, @Name, @MaxHeight, @MaxWidth, @UserId)";
+                
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
+                
+                using (var transaction = _dbConnection.BeginTransaction())
+                {
+                    int rowsAffected = await _dbConnection.ExecuteAsync(sql, new
+                    {
+                        Id = environment2D.Id,
+                        Name = environment2D.Name,
+                        MaxHeight = environment2D.MaxHeight,
+                        MaxWidth = environment2D.MaxWidth,
+                        UserId = environment2D.AppUserId
+                    }, transaction);
 
-                await _dbConnection.ExecuteAsync(sql, environment2D);
-
-                _logger.LogInformation("✅ World inserted successfully.");
+                    if (rowsAffected > 0)
+                    {
+                        _logger.LogInformation("✅ World inserted successfully.");
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ INSERT executed, but no rows affected.");
+                        transaction.Rollback();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -88,12 +113,33 @@ namespace smartoffice_web.WebApi.Repositories
                 _logger.LogInformation($"🔄 Updating world with ID: {environment2D.Id}");
 
                 string sql = @"UPDATE Environment2D 
-                               SET name = @Name, maxHeight = @MaxHeight, maxWidth = @MaxWidth, UserId = @AppUserId 
-                               WHERE id = @Id"; // ✅ AppUserId toegevoegd
+                               SET Name = @Name, MaxHeight = @MaxHeight, MaxWidth = @MaxWidth, UserId = @UserId
+                               WHERE Id = @Id";
 
-                await _dbConnection.ExecuteAsync(sql, environment2D);
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
+                
+                using (var transaction = _dbConnection.BeginTransaction())
+                {
+                    int rowsAffected = await _dbConnection.ExecuteAsync(sql, new
+                    {
+                        Id = environment2D.Id,
+                        Name = environment2D.Name,
+                        MaxHeight = environment2D.MaxHeight,
+                        MaxWidth = environment2D.MaxWidth,
+                        UserId = environment2D.AppUserId
+                    }, transaction);
 
-                _logger.LogInformation("✅ World updated successfully.");
+                    if (rowsAffected > 0)
+                    {
+                        _logger.LogInformation("✅ World updated successfully.");
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ UPDATE executed, but no rows affected.");
+                        transaction.Rollback();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -108,10 +154,25 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🗑 Deleting world with ID: {id}");
 
-                string sql = "DELETE FROM Environment2D WHERE id = @Id";
-                await _dbConnection.ExecuteAsync(sql, new { Id = id });
+                string sql = "DELETE FROM Environment2D WHERE Id = @Id";
 
-                _logger.LogInformation("✅ World deleted successfully.");
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
+
+                using (var transaction = _dbConnection.BeginTransaction())
+                {
+                    int rowsAffected = await _dbConnection.ExecuteAsync(sql, new { Id = id }, transaction);
+
+                    if (rowsAffected > 0)
+                    {
+                        _logger.LogInformation("✅ World deleted successfully.");
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"⚠️ DELETE executed, but no rows affected.");
+                        transaction.Rollback();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -119,12 +180,26 @@ namespace smartoffice_web.WebApi.Repositories
                 throw;
             }
         }
-        
+
         public async Task<IEnumerable<Object2D>> GetObjectsForWorld(Guid worldId)
         {
-            var query = "SELECT * FROM Object2D WHERE Environment2DID = @WorldId";
-            return await _dbConnection.QueryAsync<Object2D>(query, new { WorldId = worldId });
-        }
+            try
+            {
+                _logger.LogInformation($"🔍 Fetching objects for World ID: {worldId}");
 
+                string sql = "SELECT * FROM Object2D WHERE Environment2DID = @WorldId";
+
+                if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
+                var objects = await _dbConnection.QueryAsync<Object2D>(sql, new { WorldId = worldId });
+
+                _logger.LogInformation($"✅ Retrieved {objects.AsList().Count} objects.");
+                return objects;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"❌ ERROR in GetObjectsForWorld: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
