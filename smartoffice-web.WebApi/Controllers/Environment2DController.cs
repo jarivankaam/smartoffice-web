@@ -48,7 +48,7 @@ namespace smartoffice_web.WebApi.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> Create([FromBody] Environment2D environment2D)
         {
             if (environment2D == null)
