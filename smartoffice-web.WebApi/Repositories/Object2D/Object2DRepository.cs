@@ -30,13 +30,16 @@ namespace smartoffice_web.WebApi.Repositories
 
         public async Task AddObject2DAsync(Object2D object2D)
         {
-            var sql = "INSERT INTO Object2D (Id, Name, PositionX, PositionY) VALUES (@Id, @Name, @PositionX, @PositionY)";
+            var sql = @"INSERT INTO Object2D (Id, PrefabId, PositionX, PositionY, ScaleX, ScaleY, RotationZ, SortingLayer, Environment2DID) 
+                        VALUES (@Id, @PrefabId, @PositionX, @PositionY, @ScaleX, @ScaleY, @RotationZ, @SortingLayer, @Environment2DID)";
             await _dbConnection.ExecuteAsync(sql, object2D);
         }
 
         public async Task UpdateObject2DAsync(Object2D object2D)
         {
-            var sql = "UPDATE Object2D SET Name = @Name, PositionX = @PositionX, PositionY = @PositionY WHERE Id = @Id";
+            var sql = @"UPDATE Object2D 
+                        SET PrefabId = @PrefabId, PositionX = @PositionX, PositionY = @PositionY, ScaleX = @ScaleX, ScaleY = @ScaleY, RotationZ = @RotationZ, SortingLayer = @SortingLayer, Environment2DID = @Environment2DID 
+                        WHERE Id = @Id";
             await _dbConnection.ExecuteAsync(sql, object2D);
         }
 
