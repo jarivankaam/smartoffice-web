@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
 using smartoffice_web.WebApi.Services;
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
@@ -39,33 +37,20 @@ namespace smartoffice_web.WebApi.Controllers
             return Ok(user);
         }
 
-        [HttpGet("convert/{userId:guid}")]
-        public async Task<ActionResult<AppUser>> GetUserId(string userId)
-        {
-            _logger.LogInformation("Fetching user with UserId: {UserId}", userId);
-            
-            if (user == null)
-            {
-                _logger.LogWarning("User with UserId {UserId} not found.", userId);
-                return NotFound();
-            }
-            return Ok(user);
-        }
-
-        [HttpGet("current")] 
-        public async Task<ActionResult<AppUser>> GetCurrentUser()
+        [HttpGet("current")]
+        public async Task<ActionResult<Guid>> GetCurrentUser()
         {
             try
             {
                 var identityUserId = await _identityService.GetCurrentUserIdAsync(User);
                 _logger.LogInformation("Fetching current user with IdentityUserId: {IdentityUserId}", identityUserId);
+
                 var user = await _appUserRepository.GetByIdentityUserIdAsync(identityUserId);
                 if (user == null)
                 {
                     _logger.LogWarning("Current user with IdentityUserId {IdentityUserId} not found.", identityUserId);
                     return NotFound();
                 }
-                user = await _appUserRepository.GetUserIdAsync(user.IdentityUserId);
                 return Ok(user.Id);
             }
             catch (UnauthorizedAccessException ex)
@@ -86,9 +71,9 @@ namespace smartoffice_web.WebApi.Controllers
             user.Id = Guid.NewGuid();
             _logger.LogInformation("Creating new user with Id: {UserId}", user.Id);
             var createdUserId = await _appUserRepository.CreateAppUserAsync(user);
-            return CreatedAtAction(nameof(GetUserId), new { userId = createdUserId }, createdUserId);
+            return CreatedAtAction(nameof(GetByIdentityUserId), new { identityUserId = user.IdentityUserId }, createdUserId);
         }
-        
+
         [HttpGet("worlds/{userId}")]
         [Authorize]
         public async Task<ActionResult<Guid>> GetUserWorlds(Guid userId)
