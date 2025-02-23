@@ -36,5 +36,7 @@ namespace smartoffice_web.WebApi.Repositories
         /// </summary>
         Task DeleteWorldAsync(Guid id);
         
+        Task<IEnumerable<Object2D>> GetObjectsForWorld(Guid WorldID);
+        
     }
 }

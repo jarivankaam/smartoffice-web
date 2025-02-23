@@ -82,5 +82,21 @@ namespace smartoffice_web.WebApi.Controllers
             await _environment2DRepository.DeleteWorldAsync(id);
             return NoContent();
         }
+        
+        
+        [HttpGet("objects/{WorldId}")]
+        [Authorize]
+        public async Task<ActionResult<Guid>> GetObjects(Guid WorldId)
+        {
+            _logger.LogInformation("Fetching worlds for user with Id: {UserId}", WorldId);
+            var userWorlds = await _environment2DRepository.GetObjectsForWorld(WorldId);
+            if (userWorlds == null)
+            {
+                
+                return NotFound();
+            }
+            _logger.LogInformation("Worlds found: {userWorlds}", userWorlds);
+            return Ok(userWorlds);
+        }
     }
 }

@@ -120,5 +120,12 @@ namespace smartoffice_web.WebApi.Repositories
                 throw;
             }
         }
+        
+        public async Task<IEnumerable<Object2D>> GetObjectsForWorld(Guid worldId)
+        {
+            var query = "SELECT * FROM Object2D WHERE Environment2DID = @WorldId";
+            return await _dbConnection.QueryAsync<Object2D>(query, new { WorldId = worldId });
+        }
+
     }
 }
