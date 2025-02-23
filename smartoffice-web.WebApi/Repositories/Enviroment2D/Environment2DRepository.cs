@@ -25,7 +25,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation("🔍 Executing query: SELECT * FROM Environment2D");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, AppUserId FROM Environment2D"; // ✅ AppUserId toegevoegd
+                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D"; // ✅ AppUserId toegevoegd
                 var result = await _dbConnection.QueryAsync<Environment2D>(sql);
 
                 _logger.LogInformation($"✅ Query executed successfully. Retrieved {result.AsList().Count} Environment2D.");
@@ -68,7 +68,7 @@ namespace smartoffice_web.WebApi.Repositories
                 environment2D.Id = environment2D.Id == Guid.Empty ? Guid.NewGuid() : environment2D.Id;
                 _logger.LogInformation($"📝 Inserting new world with ID: {environment2D.Id}");
 
-                string sql = @"INSERT INTO Environment2D (id, name, maxHeight, maxWidth, AppUserId) 
+                string sql = @"INSERT INTO Environment2D (id, name, maxHeight, maxWidth, UserId) 
                                VALUES (@Id, @Name, @MaxHeight, @MaxWidth, @AppUserId)"; // ✅ AppUserId toegevoegd
 
                 await _dbConnection.ExecuteAsync(sql, environment2D);
@@ -89,7 +89,7 @@ namespace smartoffice_web.WebApi.Repositories
                 _logger.LogInformation($"🔄 Updating world with ID: {environment2D.Id}");
 
                 string sql = @"UPDATE Environment2D 
-                               SET name = @Name, maxHeight = @MaxHeight, maxWidth = @MaxWidth, AppUserId = @AppUserId 
+                               SET name = @Name, maxHeight = @MaxHeight, maxWidth = @MaxWidth, UserId = @AppUserId 
                                WHERE id = @Id"; // ✅ AppUserId toegevoegd
 
                 await _dbConnection.ExecuteAsync(sql, environment2D);
@@ -126,7 +126,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🔍 Fetching all worlds for User ID: {appUserId}");
 
-                string sql = "SELECT id, name, maxHeight, maxWidth, AppUserId FROM Environment2D WHERE AppUserId = @AppUserId";
+                string sql = "SELECT id, name, maxHeight, maxWidth, UserId FROM Environment2D WHERE AppUserId = @AppUserId";
                 var result = await _dbConnection.QueryAsync<Environment2D>(sql, new { AppUserId = appUserId });
 
                 _logger.LogInformation($"✅ Retrieved {result.AsList().Count} worlds for User ID: {appUserId}");
