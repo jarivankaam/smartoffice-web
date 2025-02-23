@@ -39,7 +39,7 @@ namespace smartoffice_web.WebApi.Controllers
             return Ok(user);
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("/convert/{userId}")]
         public async Task<ActionResult<AppUser>> GetUserId(string userId)
         {
             _logger.LogInformation("Fetching user with UserId: {UserId}", userId);

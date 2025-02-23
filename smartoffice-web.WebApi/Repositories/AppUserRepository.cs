@@ -26,7 +26,7 @@ public class AppUserRepository : IAppUserRepository
     
     public async Task<AppUser> GetUserIdAsync(string userID)
     {
-        var query = "SELECT * FROM AppUsers WHERE IdentityUserId = @Id";
+        var query = "SELECT Id FROM AppUsers WHERE IdentityUserId = @Id";
         return await _dbConnection.QuerySingleOrDefaultAsync<AppUser>(query, new { Id = userID });
     }
 
@@ -39,7 +39,7 @@ public class AppUserRepository : IAppUserRepository
     
     public async Task<Guid> GetUserWorlds(Guid userId)
     {
-        var query = $"SELECT name, maxHeight, maxWidth FROM Environment2D WHERE UserId = '{userId}'";
+        var query = "SELECT name, maxHeight, maxWidth FROM Environment2D WHERE UserId = @UserId";
         return await _dbConnection.QuerySingleOrDefaultAsync<Guid>(query);
     }
 }
