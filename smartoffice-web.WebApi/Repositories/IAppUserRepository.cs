@@ -9,5 +9,5 @@ public interface IAppUserRepository
     Task<AppUser> GetUserIdAsync(string userID);
     Task<Guid> CreateAppUserAsync(AppUser user);
 
-    Task<Guid> GetUserWorlds(Guid userId);
+    Task<IEnumerable<Environment2D>> GetUserWorlds(Guid userId);
 }
