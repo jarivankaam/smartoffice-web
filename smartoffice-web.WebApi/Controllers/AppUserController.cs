@@ -73,7 +73,7 @@ namespace smartoffice_web.WebApi.Controllers
             var createdUserId = await _appUserRepository.CreateAppUserAsync(user);
             return CreatedAtAction(nameof(GetByIdentityUserId), new { identityUserId = user.IdentityUserId }, createdUserId);
         }
-
+        
         [HttpGet("worlds/{userId}")]
         [Authorize]
         public async Task<ActionResult<Guid>> GetUserWorlds(Guid userId)

@@ -25,7 +25,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation("🔍 Fetching all Environment2D records...");
 
-                string sql = "SELECT Id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D";
+                string sql = "id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D";
                 if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 var result = await _dbConnection.QueryAsync<Environment2D>(sql);
 
@@ -45,7 +45,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🔍 Fetching world with ID: {id}");
 
-                string sql = "SELECT Id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D WHERE Id = @Id";
+                string sql = "SELECT id, Name, MaxHeight, MaxWidth, UserId FROM Environment2D WHERE Id = @Id";
                 if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 var world = await _dbConnection.QueryFirstOrDefaultAsync<Environment2D>(sql, new { Id = id });
 
@@ -114,7 +114,7 @@ namespace smartoffice_web.WebApi.Repositories
 
                 string sql = @"UPDATE Environment2D 
                                SET Name = @Name, MaxHeight = @MaxHeight, MaxWidth = @MaxWidth, UserId = @UserId
-                               WHERE Id = @Id";
+                               WHERE id = @Id";
 
                 if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
                 
@@ -154,7 +154,7 @@ namespace smartoffice_web.WebApi.Repositories
             {
                 _logger.LogInformation($"🗑 Deleting world with ID: {id}");
 
-                string sql = "DELETE FROM Environment2D WHERE Id = @Id";
+                string sql = "DELETE FROM Environment2D WHERE id = @Id";
 
                 if (_dbConnection.State != ConnectionState.Open) _dbConnection.Open();
 
