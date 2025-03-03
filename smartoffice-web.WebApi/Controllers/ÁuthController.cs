@@ -4,7 +4,7 @@ using smartoffice_web.WebApi.Models;
 using smartoffice_web.WebApi.Repositories;
 
 [ApiController]
-[Route("[controller]")]
+[Route("custom/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
             DisplayName = model.DisplayName
         };
 
-        await _appUserRepository.AddAsync(appUser);
+        await _appUserRepository.CreateAppUserAsync(appUser);
 
         return Ok("User registered successfully.");
     }
