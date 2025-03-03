@@ -39,7 +39,7 @@ public class AppUserRepository : IAppUserRepository
     
     public async Task<IEnumerable<Environment2D>> GetUserWorlds(Guid userId)
     {
-        var query = "SELECT Id, Name, MaxHeight, MaxWidth FROM Environment2D WHERE UserId = @UserId";
+        var query = "SELECT id, Name, MaxHeight, MaxWidth FROM Environment2D WHERE UserId = @UserId";
         return await _dbConnection.QueryAsync<Environment2D>(query, new { UserId = userId });
     }
 
