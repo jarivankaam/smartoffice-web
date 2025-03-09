@@ -8,7 +8,7 @@ namespace smartoffice_web.WebApi.Models
         public Guid Id { get; set; }
 
         [Required]
-        public Guid PrefabId { get; set; }
+        public String PrefabId { get; set; }
 
         [Required]  
         public int PositionX { get; set; }
