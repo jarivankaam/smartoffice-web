@@ -1,170 +1,162 @@
-﻿//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using Moq;
-//using Microsoft.Extensions.Logging;
-//using Microsoft.AspNetCore.Mvc;
-//using smartoffice_web.WebApi.Controllers;
-//using smartoffice_web.WebApi.Repositories;
-//using smartoffice_web.WebApi.Services;
-//using smartoffice_web.WebApi.Models;
-//using System;
-//using System.Threading.Tasks;
-//using System.Collections.Generic;
-//using System.Security.Claims;
-//using Moq;
-//using Moq.Language.Flow;
-//using Moq.Language;
-//using Moq.Protected;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using smartoffice_web.WebApi.Controllers;
+using smartoffice_web.WebApi.Models;
+using smartoffice_web.WebApi.Repositories;
+using smartoffice_web.WebApi.Services;
 
+namespace smartoffice_web.Tests.Controllers
+{
+    [TestClass]
+    public class AppUserControllerTests
+    {
+        private Mock<IAppUserRepository> _mockAppUserRepository;
+        private Mock<IIdentityService> _mockIdentityService;
+        private Mock<ILogger<AppUserController>> _mockLogger;
+        private AppUserController _controller;
 
-//namespace smartoffice_web.Tests.Controllers
-//{
-//    [TestClass]
-//    public class AppUserControllerTests
-//    {
-//        private Mock<IAppUserRepository> _mockAppUserRepository;
-//        private Mock<IIdentityService> _mockIdentityService;
-//        private Mock<ILogger<AppUserController>> _mockLogger;
-//        private AppUserController _controller;
+        [TestInitialize]
+        public void Setup()
+        {
+            _mockAppUserRepository = new Mock<IAppUserRepository>();
+            _mockIdentityService = new Mock<IIdentityService>();
+            _mockLogger = new Mock<ILogger<AppUserController>>();
+            _controller = new AppUserController(_mockAppUserRepository.Object, _mockIdentityService.Object, _mockLogger.Object);
+        }
 
-//        [TestInitialize]
-//        public void Setup()
-//        {
-//            _mockAppUserRepository = new Mock<IAppUserRepository>();
-//            _mockIdentityService = new Mock<IIdentityService>();
-//            _mockLogger = new Mock<ILogger<AppUserController>>();
-//            _controller = new AppUserController(_mockAppUserRepository.Object, _mockIdentityService.Object, _mockLogger.Object);
-//        }
+        [TestMethod]
+        public async Task GetByIdentityUserId_UserExists_ReturnsOk()
+        {
+            // ARRANGE
+            var identityUserId = "test-identity-user-id";
+            var user = new AppUser { Id = Guid.NewGuid(), IdentityUserId = identityUserId };
+            _mockAppUserRepository
+                .Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId))
+                .ReturnsAsync(user);
 
-//        [TestMethod]
-//        public async Task GetByIdentityUserId_UserExists_ReturnsOk()
-//        {
-//            // Arrange
-//            var userId = "test-identity-user-id";
-//            var user = new AppUser { Id = Guid.NewGuid(), IdentityUserId = userId };
-//            _mockAppUserRepository.Setup(repo => repo.GetByIdentityUserIdAsync(userId)).ReturnsAsync(user);
+            // ACT
+            var response = await _controller.GetByIdentityUserId(identityUserId);
 
-//            // Act
-//            var result = await _controller.GetByIdentityUserId(userId);
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(OkObjectResult));
+            var okResult = response.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+            Assert.IsInstanceOfType(okResult.Value, typeof(AppUser));
+            var returnedUser = okResult.Value as AppUser;
+            Assert.AreEqual(user.Id, returnedUser.Id);
+        }
 
-//            // Assert
-//            var okResult = result.Result as OkObjectResult;
-//            Assert.IsNotNull(okResult);
-//            Assert.AreEqual(200, okResult.StatusCode);
-//            Assert.AreEqual(user, okResult.Value);
-//        }
+        [TestMethod]
+        public async Task GetByIdentityUserId_UserDoesNotExist_ReturnsNotFound()
+        {
+            // ARRANGE
+            var identityUserId = "non-existent-user";
+            _mockAppUserRepository
+                .Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId))
+                .ReturnsAsync((AppUser)null);
 
-//        [TestMethod]
-//        public async Task GetByIdentityUserId_UserDoesNotExist_ReturnsNotFound()
-//        {
-//            // Arrange
-//            var userId = "non-existent-user";
-//            _mockAppUserRepository.Setup(repo => repo.GetByIdentityUserIdAsync(userId)).ReturnsAsync((AppUser)null);
+            // ACT
+            var response = await _controller.GetByIdentityUserId(identityUserId);
 
-//            // Act
-//            var result = await _controller.GetByIdentityUserId(userId);
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(NotFoundResult));
+        }
 
-//            // Assert
-//            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
-//        }
+        [TestMethod]
+        public async Task GetCurrentUser_UserExists_ReturnsOk()
+        {
+            // ARRANGE
+            var identityUserId = "test-user-id";
+            var user = new AppUser { Id = Guid.NewGuid(), IdentityUserId = identityUserId };
+            _mockIdentityService
+                .Setup(service => service.GetCurrentUserIdAsync(It.IsAny<ClaimsPrincipal>()))
+                .ReturnsAsync(identityUserId);
+            _mockAppUserRepository
+                .Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId))
+                .ReturnsAsync(user);
 
-//        [TestMethod]
-//        public async Task GetCurrentUser_UserExists_ReturnsOk()
-//        {
-//            // Arrange
-//            var identityUserId = "test-user-id";
-//            var user = new AppUser { Id = Guid.NewGuid(), IdentityUserId = identityUserId };
-//            _mockIdentityService.Setup(service => service.GetCurrentUserIdAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(identityUserId);
-//            _mockAppUserRepository.Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId)).ReturnsAsync(user);
+            // ACT
+            var response = await _controller.GetCurrentUser();
 
-//            // Act
-//            var result = await _controller.GetCurrentUser();
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(OkObjectResult));
+            var okResult = response.Result as OkObjectResult;
+            Assert.IsNotNull(okResult);
+            Assert.AreEqual(200, okResult.StatusCode);
+            // Assuming GetCurrentUser returns the user's Id
+            Assert.AreEqual(user.Id, okResult.Value);
+        }
 
-//            // Assert
-//            var okResult = result.Result as OkObjectResult;
-//            Assert.IsNotNull(okResult);
-//            Assert.AreEqual(200, okResult.StatusCode);
-//            Assert.AreEqual(user.Id, okResult.Value);
-//        }
+        [TestMethod]
+        public async Task GetCurrentUser_UserDoesNotExist_ReturnsNotFound()
+        {
+            // ARRANGE
+            var identityUserId = "unknown-user";
+            _mockIdentityService
+                .Setup(service => service.GetCurrentUserIdAsync(It.IsAny<ClaimsPrincipal>()))
+                .ReturnsAsync(identityUserId);
+            _mockAppUserRepository
+                .Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId))
+                .ReturnsAsync((AppUser)null);
 
-//        [TestMethod]
-//        public async Task GetCurrentUser_UserDoesNotExist_ReturnsNotFound()
-//        {
-//            // Arrange
-//            var identityUserId = "unknown-user";
-//            _mockIdentityService.Setup(service => service.GetCurrentUserIdAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(identityUserId);
-//            _mockAppUserRepository.Setup(repo => repo.GetByIdentityUserIdAsync(identityUserId)).ReturnsAsync((AppUser)null);
+            // ACT
+            var response = await _controller.GetCurrentUser();
 
-//            // Act
-//            var result = await _controller.GetCurrentUser();
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(NotFoundResult));
+        }
 
-//            // Assert
-//            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
-//        }
+        [TestMethod]
+        public async Task Create_ValidUser_ReturnsCreated()
+        {
+            // ARRANGE
+            var newUser = new AppUser { IdentityUserId = "new-user-id" };
+            // Simulate a created user by returning a new Guid from the repository.
+            _mockAppUserRepository
+                .Setup(repo => repo.CreateAppUserAsync(It.IsAny<AppUser>()))
+                .ReturnsAsync(Guid.NewGuid());
 
-//        [TestMethod]
-//        public async Task Create_ValidUser_ReturnsCreated()
-//        {
-//            // Arrange
-//            var user = new AppUser { IdentityUserId = "new-user-id" };
-//            _mockAppUserRepository.Setup(repo => repo.CreateAppUserAsync(It.IsAny<AppUser>())).ReturnsAsync(Guid.NewGuid());
+            // ACT
+            var response = await _controller.Create(newUser);
 
-//            // Act
-//            var result = await _controller.Create(user);
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(CreatedAtActionResult));
+            var createdResult = response.Result as CreatedAtActionResult;
+            Assert.IsNotNull(createdResult);
+            Assert.AreEqual(201, createdResult.StatusCode);
+        }
 
-//            // Assert
-//            var createdResult = result.Result as CreatedAtActionResult;
-//            Assert.IsNotNull(createdResult);
-//            Assert.AreEqual(201, createdResult.StatusCode);
-//        }
+        [TestMethod]
+        public async Task Create_NullUser_ReturnsBadRequest()
+        {
+            // ACT
+            var response = await _controller.Create(null);
 
-//        [TestMethod]
-//        public async Task Create_NullUser_ReturnsBadRequest()
-//        {
-//            // Act
-//            var result = await _controller.Create(null);
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(BadRequestObjectResult));
+        }
 
-//            // Assert
-//            Assert.IsInstanceOfType(result.Result, typeof(BadRequestObjectResult));
-//        }
+        [TestMethod]
+        public async Task GetUserWorlds_UserDoesNotExist_ReturnsNotFound()
+        {
+            // ARRANGE
+            var userId = Guid.NewGuid();
+            _mockAppUserRepository
+                .Setup(repo => repo.GetUserWorlds(userId))
+                .ReturnsAsync((IEnumerable<Environment2D>)null);
 
-//        [TestMethod]
-//        public async Task GetUserWorlds_UserExists_ReturnsOk()
-//        {
-//            // Arrange
-//            var userId = Guid.NewGuid();
-//            var worlds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+            // ACT
+            var response = await _controller.GetUserWorlds(userId);
 
-//            _mockAppUserRepository
-//     .Setup(repo => repo.GetUserWorlds(It.IsAny<Guid>()))
-//     .ReturnsAsync(new List<Environment2D> { new Environment2D(), new Environment2D() }.AsEnumerable());
-
-
-//            // Act
-//            var result = await _controller.GetUserWorlds(userId);
-
-//            // Assert
-//            var okResult = result.Result as OkObjectResult;
-//            Assert.IsNotNull(okResult);
-//            Assert.AreEqual(200, okResult.StatusCode);
-//            Assert.AreEqual(worlds, okResult.Value);
-//        }
-
-
-//        [TestMethod]
-//        public async Task GetUserWorlds_UserDoesNotExist_ReturnsNotFound()
-//        {
-//            // Arrange
-//            var userId = Guid.NewGuid();
-//            _mockAppUserRepository
-//                .Setup(repo => repo.GetUserWorlds(userId))
-//                .ReturnsAsync(null as IEnumerable<Environment2D>); // Correct null handling
-
-//            // Act
-//            var result = await _controller.GetUserWorlds(userId);
-
-//            // Assert
-//            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
-//        }
-
-//    }
-//}
+            // ASSERT
+            Assert.IsInstanceOfType(response.Result, typeof(NotFoundResult));
+        }
+    }
+}
